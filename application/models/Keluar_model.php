@@ -115,6 +115,7 @@ class Keluar_model extends CI_Model {
         $this->db->from($this->table);
         $this->db->where($where);
         $this->db->group_by('kd_transaksi');
+        $this->db->order_by('created_at','DESC');
         $query = $this->db->get();
         return $query;
     }

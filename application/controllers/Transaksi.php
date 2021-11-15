@@ -795,9 +795,11 @@ class Transaksi extends CI_Controller {
     public function pendapatan()
     {
       $where = [
-        'DATE(tanggal)' => $this->input->get('tanggal')
+        'DATE(tanggal) >=' => $this->input->get('tgl_awal'),
+        'DATE(tanggal) <=' => $this->input->get('tgl_akhir')
       ];
       $data = [
+        'page_header' => "Table Pendapatan",
         'group_transaksi' => $this->keluar_model->group_transaksi($where)->result(),
       ];
       $this->load->view('transaksi/keluar/keluar_pendapatan', $data);
@@ -872,7 +874,10 @@ class Transaksi extends CI_Controller {
      
       $printer->text($perusahaan->nama_perusahaan . "\n");
       $printer->selectPrintMode();
+
+      $printer->setFont(Printer::FONT_B);
       $printer->text($perusahaan->alamat . "\n");
+      $printer->setFont();
 
       $printer->setJustification();
       $printer->setJustification(Printer::JUSTIFY_CENTER);
@@ -916,8 +921,8 @@ class Transaksi extends CI_Controller {
 
       $printer->setFont(Printer::FONT_C);
       $printer->setJustification(Printer::JUSTIFY_CENTER);
-      $printer->text("TERIMA KASIH TELAH BERBELANJA\n");
-      $printer->text("NIKMATI BELANJA HARGA MURAH\n");
+      $printer->text("ALHAMDULILLAH MATUR NUWUN\n");
+      $printer->text("BELANJA MURAH, BERKAH MELIMPAH RUAH\n");
       $printer->setJustification();
       $printer->setFont();
 

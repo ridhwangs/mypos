@@ -1,20 +1,29 @@
 <div class="container">
     <div class="row d-flex justify-content-center">
         <div class="col-md-6">
+            <a href="<?= site_url('transaksi/keluar'); ?>" class="btn btn-sm btn-danger rounded-0 mb-2" style="margin-top:-20px;"> Kembali</a>
             <div class="tile" style="height: 80vh">
                 <div class="title">
                     <form type="GET">
-                        <div class="input-group">
-                            <a href="<?= site_url('transaksi/keluar'); ?>" id="btn-back" class="btn btn-sm btn-primary rounded-0 " autofocus><i class="fas fa-caret-left"></i> Kembali</a>
-                            <input class="form-control" type="date" id="tanggal" name="tanggal" value="<?= $this->input->get('tanggal') ?>" autofocus required>
-                            <button type="submit" class="rounded-0">Filter</button>
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">Tanggal</label>
+                            <div class="col-md-4">
+                                <input class="form-control form-control-sm" type="date" name="tgl_awal" value="<?= $this->input->get('tgl_awal') ?>" id="tgl_awal" placeholder="Tanggal" required>
+                            </div>
+                            <label class="control-label col-md-2">Hingga</label>
+                            <div class="col-md-4">
+                                <input class="form-control form-control-sm" type="date" name="tgl_akhir" value="<?= $this->input->get('tgl_akhir') ?>" id="tgl_akhir" placeholder="Tanggal" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <button type="submit" class="btn btn-sm btn-primary rounded-0 btn-block"><i class="fas fa-filter"></i> Filter</button>
+                            </div>
                         </div>
                     </form>
                 </div>
-                <div class="tile-body " style="min-height: 100%">
-                 
-                    <hr>
-                    <div class="table-responsive" style="max-height:60vh;overflow-y: scroll;">
+                <div class="tile-body" style="min-height: 100%">
+                    <div class="table-responsive" style="max-height:55vh;overflow-y: scroll;">
                         <table class="table table-sm table-bordered table-hover">
                             <thead>
                                 <tr>

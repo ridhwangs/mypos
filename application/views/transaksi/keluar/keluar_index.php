@@ -1,7 +1,10 @@
 
 <div class="col-md-12">
     <div class="tile" style="height: 80vh">
-        <h3 class="tile-title"><i class="fas fa-cash-register"></i> <?= date('d F Y') ?></h3>
+        <div class="tile-title-w-btn  mb-0">
+            <h3 class="tile-title"><i class="fas fa-cash-register"></i> <?= date('d F Y') ?></h3>
+            <a href="<?= site_url('transaksi/keluar'); ?>" class="btn btn-sm btn-success btn-flat rounded-0"><i class="app-menu__icon fas fa-dolly-flatbed"></i>Buat Transaksi Baru</a>
+        </div>
         <div class="row">
             <div class="col-md-4 border-right" >
                 <div class="tile-body " style="min-height: 100%">
@@ -29,7 +32,7 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td class="text-center btn-sm btn-outline-secondary rounded-0" colspan="3"><a class="text-dark" href="<?= site_url('transaksi/pendapatan?tanggal='. date('Y-m-d')); ?>">Lihat lebih banyak...</a></td>
+                                    <td class="text-center rounded-0" colspan="3"><a class="text-dark" href="<?= site_url('transaksi/pendapatan?tgl_awal='. date('Y-m-d').'&tgl_akhir='.date('Y-m-d')); ?>">Tampil lebih banyak...</a></td>
                                 </tr>
                             </tfoot>
                         </table>
