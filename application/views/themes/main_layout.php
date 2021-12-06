@@ -58,13 +58,7 @@
       $user = $this->ion_auth->user()->row();
       $perusahaan = $this->crud_model->read('perusahaan')->row();
     ?>
-    <footer class="fixed-bottom" style="border-top: 1px solid red;">
-      <div class="container-fluid bg-light">
-        <ul class="navbar-nav">
-          <li class="nav-item text-right">Page rendered in <strong>{elapsed_time}</strong> seconds. <?php echo (ENVIRONMENT === 'development') ? 'CodeIgniter Version <strong>' . CI_VERSION . '</strong>' : '' ?></li>
-        </ul>
-      </div>
-    </footer>
+
 
       <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark app-header">
 

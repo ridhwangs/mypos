@@ -3,13 +3,13 @@
     <div class="tile" style="height: 80vh">
         <div class="tile-title-w-btn  mb-0">
             <h3 class="tile-title"><i class="fas fa-cash-register"></i> <?= date('d F Y') ?></h3>
-            <a href="<?= site_url('transaksi/keluar'); ?>" class="btn btn-sm btn-success btn-flat rounded-0"><i class="app-menu__icon fas fa-dolly-flatbed"></i>Buat Transaksi Baru</a>
+            <a href="<?= site_url('transaksi/keluar'); ?>" class="btn btn-sm btn-success btn-flat rounded-0"> <i class="app-menu__icon fas fa-dolly-flatbed"></i>Buat Transaksi Baru</a>
         </div>
         <div class="row">
             <div class="col-md-4 border-right" >
                 <div class="tile-body " style="min-height: 100%">
                     <div class="table-responsive" style="max-height:65vh;overflow-y: scroll;">
-                        <table class="table table-sm table-hover">
+                        <table class="table table-sm table-bordered table-hover">
                             <thead>
                                 <tr>
                                     <th>No Transaksi</th>
@@ -95,8 +95,8 @@
                         <table class="table table-sm table-hover table-bordered" >
                             <thead class="text-center">
                                 <tr>
-                                    <th>Nama</th>
-                                    <th width="150px">Harga</th>
+                                    <th colspan="2">Nama</th>
+                                    <th colspan="2" >Harga</th>
                                     <th width="100px">Qty</th>
                                     <th width="150px">Jumlah</th>
                                 </tr>
@@ -105,6 +105,7 @@
                                 <?php
                                     $sum_qty = 0;
                                     $sum_total = 0;
+                                    $status = '';
                                     foreach ($detail as $key => $rows) {
                                         $inventory = $this->crud_model->read('inventory',['kd_barang' => $rows->kd_barang])->row();
                                         $sum_qty += $rows->qty;
@@ -114,9 +115,20 @@
                                              <input type="hidden" name="tk_id" value="<?= $rows->tk_id ?>">
                                         <?php
                                         echo '<tr>
+                                                <td width="1%">'.$inventory->kd_barang.'</td>
                                                 <td>'.$inventory->nm_barang.'</td>
-                                                <td><span class="float-left">Rp.</span><div class="text-right">'.number_format($rows->harga, 0, ',', '.').'</div></td>
-                                                <td class="text-center"><input type="number" name="qty" id="qty_row" class="form-control form-control-sm rounded-0 text-center" value="'.$rows->qty.'" required></td>
+                                         
+                                                <td width="150px"><span class="float-left">Rp.</span><div class="text-right">'.number_format($rows->harga, 0, ',', '.').'</div></td>
+                                                <td width="1%">'.$inventory->satuan.'</td>
+                                                <td class="text-center">';
+                                                if($rows->pelanggan == true){
+                                                    echo $rows->qty;
+                                                    $status = true;
+                                                }else{
+                                                    $status = false;
+                                                    echo '<input type="number" name="qty" id="qty_row" class="form-control form-control-sm rounded-0 text-center" value="'.$rows->qty.'" required>';
+                                                }
+                                                echo '</td>
                                                 <td><span class="float-left">Rp.</span> <div class="text-right">'.number_format($rows->harga * $rows->qty, 0, ',', '.').'</div></td>
                                             </tr>';
                                         ?>
@@ -133,7 +145,10 @@
                         <input type="hidden" name="kd_transaksi" value="<?= $this->uri->segment(3); ?>">
                         <input type="hidden" name="jumlah" value="<?= $sum_total; ?>">
                             <tr>
-                                <th class="text-right" colspan="3">Total</th>
+                               
+                                <th class="text-left" colspan="1"> No transaksi: <?= $this->uri->segment(3) ?></th>
+                                <th class="text-left" colspan="1"></th>
+                                <th class="text-right" colspan="1">Total</th>
                                 <th width="350px"><div class="text-right"><span class="float-left">Rp.</span><?= number_format($sum_total, 0, ',', '.') ?></div></th>
                             </tr>
                             <tr>
@@ -141,9 +156,13 @@
                                 <th><input class="form-control form-control-sm rupiah" type="text" name="bayar" placeholder="Pembayaran (Rp.)" id="bayar" required></th>
                             </tr>
                         </form>
-                        <tr>
+                        <?php
+                            if($sum_total > 0) :
+                        ?>
+                        <tr class="bg-dark text-white">
                             <th colspan="4"><i><?= ucwords(number_to_words($sum_total)); ?> Rupiah</i></th>
                         </tr>
+                        <?php endif; ?>
                     </table>
                 </div>
             </div>
@@ -152,6 +171,9 @@
 </div>
 
 <script>
+    <?php if(!empty($status)): ?>
+        $("input").prop('disabled', true);
+    <?php endif; ?>
     var tanggal = '<?= date('Y-m-d'); ?>';
     <?php if(!empty($this->session->flashdata('autofocus'))): ?>
         $("#<?= $this->session->flashdata('autofocus'); ?>").addClass(' is-invalid').focus();

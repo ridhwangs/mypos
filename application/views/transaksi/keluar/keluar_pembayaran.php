@@ -16,6 +16,11 @@
         <div class="tile-body">
             <table class="table table-sm">
                 <tr>
+                    <td width="100px">Kode Transaksi</td>
+                    <td width="1px">:</td>
+                    <td><?= $kd_transaksi; ?></td>
+                </tr>
+                <tr>
                     <td width="100px">Total</td>
                     <td width="1px">:</td>
                     <td>Rp. <?= number_format($jumlah, 0, ',', '.') ?></td>
@@ -38,14 +43,16 @@
                     <td>:</td>
                     <td>Rp. <?= number_format($kembali, 0, ',', '.') ?></td>
                 </tr>
+                <?php if($kembali > 0): ?>
                 <tr>
                     <th></th>
                     <th colspan="2"><i><?= ucwords(number_to_words($kembali)); ?> Rupiah</i></th>
                 </tr>
+                <?php endif; ?>
             </table>
         </div>
         <div class="tile-footer p-2">
-          <a href="<?= site_url('transaksi/keluar'); ?>" id="btn-back" class="btn btn-sm btn-primary rounded-0 " autofocus><i class="fas fa-caret-left"></i> Kembali</a>
+          <button onclick="location.replace('<?= site_url('transaksi/keluar'); ?>')" id="btn-back" class="btn btn-sm btn-primary rounded-0 " autofocus><i class="fas fa-caret-left"></i> Kembali</button>
         </div>
     </div>
     

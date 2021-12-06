@@ -195,21 +195,38 @@ class Transaksi extends CI_Controller {
               'tk_id' => $this->input->post('tk_id')
             ];
             $transak_keluar = $this->crud_model->read('transaksi_keluar',$where)->row();
-            $qty_now = $transak_keluar->qty_before + $transak_keluar->qty - $this->input->post('qty');
+            $data_barang = $this->crud_model->read('inventory', array('kd_barang' => $transak_keluar->kd_barang))->row();
+            $qty_now = $transak_keluar->qty_before - $this->input->post('qty');
             $data = [
-              'qty_before' => $qty_now,
               'qty' => $this->input->post('qty')
             ];
-            $data_barang = $this->crud_model->read('inventory', array('kd_barang' => $transak_keluar->kd_barang))->row();
+        
             $stock_sekarang = $qty_now;
 
+            // echo 'QTY BEFORE : '. $transak_keluar->qty_before.'<br>';
+            // echo 'QTY AFTER : '. $transak_keluar->qty.'<br>';
+            // echo 'INPUT : '. $this->input->post('qty').'<br>';
+            // echo 'STOCK NOW : '. $stock_sekarang.'<br>';
             
-            
-            $this->crud_model->update('transaksi_keluar', $where, $data);
-            $this->crud_model->update('inventory', array('kd_barang' => $transak_keluar->kd_barang), array('quantity_on_hand' => $stock_sekarang));
-            if($data['qty'] == 0){
-              $this->crud_model->delete('transaksi_keluar', $where);
+     
+
+            if($data['qty']  >  $transak_keluar->qty_before){
+              $set_flashdata = [
+                'message' => date('Y-m-d H:i:s').' - Tidak boleh melebihi dari jumlah stock ['.$transak_keluar->qty_before.']',
+                'error' => true
+              ];
+    
+              $this->session->set_flashdata($set_flashdata);
+            }else{
+              $this->crud_model->update('transaksi_keluar', $where, $data);
+              $this->crud_model->update('inventory', array('kd_barang' => $transak_keluar->kd_barang), array('quantity_on_hand' => $stock_sekarang));  
+        
+              if($data['qty'] == 0){
+                $this->crud_model->delete('transaksi_keluar', $where);
+              }
             }
+
+           
             // print_r($where);
             redirect($this->agent->referrer());
             die();
@@ -769,7 +786,7 @@ class Transaksi extends CI_Controller {
         'kembali' => str_replace('.','',$this->input->post('bayar')) - $this->input->post('jumlah'),
         'perusahaan' => $this->crud_model->read('perusahaan')->row(),
       ];
-
+      $this->crud_model->update('transaksi_keluar',['kd_transaksi' => $data['kd_transaksi']], ['pelanggan' => true]);
       if($data['jumlah'] > $data['bayar']){
         $set_flashdata = [
           'message' => "Pembayaran harus lebih besar dari harga total.",
