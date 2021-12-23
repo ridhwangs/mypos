@@ -176,7 +176,7 @@
           <div class="form-group row">
             <label class="control-label control-label-sm col-md-3">Stock Akhir</label>
             <div class="col-md-9">
-              <input class="form-control small col-md-4" type="number" name="quantity_on_hand" id="e_quantity_on_hand" placeholder="00.0" readonly>
+              <input class="form-control small col-md-4" type="number" name="quantity_on_hand" id="e_quantity_on_hand" placeholder="00.0">
             </div>
           </div>
           <div class="form-group row">

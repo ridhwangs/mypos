@@ -138,6 +138,7 @@ class Inventory extends CI_Controller {
           $data = array(
               'kd_barang' => strtoupper($this->input->post('kd_barang')),
               'nm_barang' => $this->input->post('nm_barang'),
+              'quantity_on_hand' => $this->input->post('quantity_on_hand'),
               'minimum_stock' => $this->input->post('minimum_stock'),
               'harga' => str_replace('.','',$this->input->post('harga')),
               'satuan' => $this->input->post('satuan'),
