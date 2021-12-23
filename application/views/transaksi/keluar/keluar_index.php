@@ -60,7 +60,10 @@
                                 <div class="form-group row mb-0">
                                     <div class="col-md-12">
                                         <div class="input-group">
-                                            <input class="form-control form-control-sm" type="text" id="kd_barang" name="kd_barang" autofocus required>
+                                            <!-- <input class="form-control form-control-sm" type="text" id="kd_barang" name="kd_barang" autofocus required> -->
+                                            <select class="rounded-0" name="kd_barang" id="select2_kd_barang" required>
+
+                                            </select>
                                         </div>
                                         <?php if(!empty($this->session->flashdata('message'))): ?>
                                         <small id="passwordHelpBlock" class="form-text text-muted">
@@ -373,5 +376,28 @@
                 $("#bayar").focus();
                 return false;
             }
-      });
+    });
+
+    $("#select2_kd_barang").select2({
+        width: "100%",
+        placeholder: "Kode Barang / Nama Barang",
+          ajax: {
+              url: "<?php echo site_url('inventory/read/select2') ?>",
+              dataType: 'json',
+              data: function (params) {
+                  var queryParameters = {
+                      text: params.term
+                  }
+                  return queryParameters;
+              }
+          },
+          cache: false,
+          allowClear : true,
+          minimumInputLength: 3,
+          containerCssClass: ':all:',
+          selectOnClose: true,
+    });
+    $("#select2_kd_barang").on('change', function(e) {
+        document.getElementById("form-keluar").submit();
+    });
 </script>
