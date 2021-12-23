@@ -38,6 +38,13 @@ class Pengaturan extends CI_Controller {
 		$this->output->set_template('main_layout');
 	  }
 
+    public function backup()
+    {
+      $data = array(
+        'page_header' => 'Backup Database',
+      );
+      $this->load->view('pengaturan/database/backup/backup_index', $data);
+    }
 
     public function perusahaan(){
       $data = array(
@@ -45,6 +52,42 @@ class Pengaturan extends CI_Controller {
           'perusahaan' => $this->crud_model->read('perusahaan')->row(),
       );
       $this->load->view('pengaturan/perusahaan/perusahaan_index', $data);
+    }
+
+    public function create($attr)
+    {
+      switch ($attr) {
+        case 'backup':
+          $usr = $this->input->get('usr');
+
+          $this->load->dbutil();
+
+          $prefs = array(
+            'format' => 'zip',
+            'filename' => 'mypos.sql'
+          );
+
+          $backup = &$this->dbutil->backup($prefs);
+          if(!empty($usr)){
+            $db_name = 'mypos-cron_'.$usr.'-' . date("YmdHis") . '.zip'; // file name
+          }else{
+            $db_name = 'mypos-manual-' . date("YmdHis") . '.zip'; // file name
+            
+          }
+          $save  = 'backup/db/' . $db_name; // dir name backup output destination
+
+          $this->load->helper('file');
+          write_file($save, $backup);
+
+          $this->load->helper('download');
+          // force_download($db_name, $backup);
+          redirect($this->agent->referrer());
+          break;
+
+        default:
+          show_404();
+          break;
+      }
     }
 
     public function update($params)
@@ -95,6 +138,20 @@ class Pengaturan extends CI_Controller {
         
         default:
             show_404();
+          break;
+      }
+    }
+
+    public function delete($attr, $id = null)
+    {
+      switch ($attr) {
+        case 'backup':
+          unlink('backup/db/' . $id);
+          redirect($this->agent->referrer());
+          break;
+
+        default:
+          # code...
           break;
       }
     }
