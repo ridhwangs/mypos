@@ -12,10 +12,16 @@ class Crud_model extends CI_Model {
         $this->db->insert($table,  $data);
     }
 
-    public function read($table, $where = null) {
+    public function read($table, $where = null, $order = null, $sort = null, $limit = null){
       $this->db->from($table);
       if($where != null){
         $this->db->where($where);
+      }
+      if ($order != null) {
+        $this->db->order_by($order, $sort);
+      }
+      if ($limit != null) {
+        $this->db->limit($limit);
       }
       $query = $this->db->get();
       return $query;
