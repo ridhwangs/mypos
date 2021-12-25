@@ -37,6 +37,7 @@
                             </tfoot>
                         </table>
                     </div>
+                    
                     <table class="table table-sm">
                         <tr>
                             <td>Total Pendapatan Harian</td>
@@ -60,10 +61,14 @@
                                 <div class="form-group row mb-0">
                                     <div class="col-md-12">
                                         <div class="input-group">
-                                            <!-- <input class="form-control form-control-sm" type="text" id="kd_barang" name="kd_barang" autofocus required> -->
-                                            <select class="rounded-0" name="kd_barang" id="select2_kd_barang" required>
+                                            <input class="form-control form-control-sm mr-2" type="text" id="kd_barang" name="kd_barang" autofocus required>
+                                            <!-- Button trigger modal -->
+                                            <button type="button" class="btn btn-primary btn-sm rounded-0" data-toggle="modal" data-target="#modalSearch">
+                                                <i class="fa fa-search" aria-hidden="true"></i>
+                                            </button>
+                                            <!-- <select class="rounded-0" name="kd_barang" id="select2_kd_barang" required>
 
-                                            </select>
+                                            </select> -->
                                         </div>
                                         <?php if(!empty($this->session->flashdata('message'))): ?>
                                         <small id="passwordHelpBlock" class="form-text text-muted">
@@ -171,8 +176,41 @@
             </div>
         </div>
     </div>
+    
 </div>
 
+
+<!-- Modal -->
+<div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Form pencarian Tambah Barang</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-vertical" method="POST" action="<?= site_url('transaksi/create/keluar'); ?>" autocomplete="off" id="form-modal-keluar">
+            <input class="form-control form-control-sm col-md-6" type="hidden" name="tanggal" placeholder="tanggal" id="tanggal" required>
+            <input class="form-control form-control-sm" type="hidden" name="kd_transaksi" value="<?= $this->uri->segment(3) ?>" id="kd_transaksi" placeholder="Kode Transaksi" readonly>
+            <div class="form-group row mb-0">
+                <div class="col-md-12">
+                    <div class="input-group">
+                        <select class="rounded-0" name="kd_barang" id="select2_kd_barang" required>
+
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm rounded-0" data-dismiss="modal">Close</button>
+        <button type="submit" form="form-modal-keluar" class="btn btn-primary btn-sm rounded-0">Tambah Barang</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
     <?php if(!empty($status)): ?>
         $("input").prop('disabled', true);
@@ -181,7 +219,7 @@
     <?php if(!empty($this->session->flashdata('autofocus'))): ?>
         $("#<?= $this->session->flashdata('autofocus'); ?>").addClass(' is-invalid').focus();
     <?php endif; ?>
-    $("#tanggal").val(tanggal);
+    $(".tanggal").val(tanggal);
     
    
     var table;
@@ -396,8 +434,5 @@
           minimumInputLength: 3,
           containerCssClass: ':all:',
           selectOnClose: true,
-    });
-    $("#select2_kd_barang").on('change', function(e) {
-        document.getElementById("form-keluar").submit();
     });
 </script>
