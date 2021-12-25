@@ -422,6 +422,12 @@
                 $("#bayar").focus();
                 return false;
             }
+            if(e.keyCode == 70 && e.ctrlKey){
+                $('#modalSearch').modal('show'); 
+            }
+            if(e.keyCode === 38){ 
+                $('#modalSearch').modal('show'); 
+            }
     });
 
     $("#select2_kd_barang").select2({
