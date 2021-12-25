@@ -66,9 +66,6 @@
                                             <button type="button" class="btn btn-primary btn-sm rounded-0" data-toggle="modal" data-target="#modalSearch">
                                                 <i class="fa fa-search" aria-hidden="true"></i>
                                             </button>
-                                            <!-- <select class="rounded-0" name="kd_barang" id="select2_kd_barang" required>
-
-                                            </select> -->
                                         </div>
                                         <?php if(!empty($this->session->flashdata('message'))): ?>
                                         <small id="passwordHelpBlock" class="form-text text-muted">
@@ -224,7 +221,6 @@
    
     var table;
     $(document).ready(function () {
-        $('#select2_kd_barang').select2('open');
         $("#tile-form-keluar").hide();
         table = $('#datatable').DataTable({
             "paging": false,
@@ -247,10 +243,22 @@
         });
     });
 
+       
     function reload_table() {
         table.ajax.reload(null, false);
     }
-
+    $(document).ready(function() {
+        $('#modalSearch').on('shown.bs.modal', function() {
+            $('#select2_kd_barang').select2('open');
+        });
+        $('#modalSearch').on('hide.bs.modal', function() {
+            setTimeout(function() { 
+                $("#kd_barang").focus();
+            }, 1000);
+           
+        });
+    });
+   
     $('#form-filter').submit(function() {
         $.ajax({
             type: 'POST',
