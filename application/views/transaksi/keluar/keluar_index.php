@@ -49,7 +49,7 @@
             <div class="col-md-8">
                 <div class="tile-body">
                       <form class="form-vertical" method="POST" action="<?= site_url('transaksi/create/keluar'); ?>" autocomplete="off" id="form-keluar">
-                            <input class="form-control form-control-sm col-md-6" type="hidden" name="tanggal" placeholder="tanggal" id="tanggal" required>
+                            <input class="form-control form-control-sm col-md-6 tanggal" type="hidden" name="tanggal" placeholder="tanggal" id="tanggal" required>
                             <input class="form-control form-control-sm" type="hidden" name="kd_transaksi" value="<?= $this->uri->segment(3) ?>" id="kd_transaksi" placeholder="Kode Transaksi" readonly>
                                  
                                 <!-- <div class="form-group row">
@@ -189,7 +189,7 @@
       </div>
       <div class="modal-body">
         <form class="form-vertical" method="POST" action="<?= site_url('transaksi/create/keluar'); ?>" autocomplete="off" id="form-modal-keluar">
-            <input class="form-control form-control-sm col-md-6" type="hidden" name="tanggal" placeholder="tanggal" id="tanggal" required>
+            <input class="form-control form-control-sm col-md-6 tanggal" type="hidden" name="tanggal" placeholder="tanggal" id="tanggal" required>
             <input class="form-control form-control-sm" type="hidden" name="kd_transaksi" value="<?= $this->uri->segment(3) ?>" id="kd_transaksi" placeholder="Kode Transaksi" readonly>
             <div class="form-group row mb-0">
                 <div class="col-md-12">
