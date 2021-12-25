@@ -55,9 +55,8 @@ class Transaksi extends CI_Controller {
     }
 
     public function keluar($id = null){
-      $count = $this->crud_model->read('transaksi_keluar')->num_rows();
       if(empty($id)){
-        redirect('transaksi/keluar/TK-'.str_pad($count, 8, '0', STR_PAD_LEFT), 'refresh');
+        redirect('transaksi/keluar/TK-'.str_pad(date('ymdhis') + 1, 8, '0', STR_PAD_LEFT), 'refresh');
       }
       $where = [
         'DATE(tanggal)' => date('Y-m-d')
