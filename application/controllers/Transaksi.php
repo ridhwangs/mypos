@@ -55,11 +55,21 @@ class Transaksi extends CI_Controller {
     }
 
     public function keluar($id = null){
-      $tk = $this->crud_model->read('transaksi_keluar',null,'kd_transaksi','DESC')->row();
-      $last =  preg_replace('/\D/', '', $tk->tk_id) + 1;
- 
+      $where_sequence = ['jenis' => 'TK','bulan' => date('m'), 'tahun' => date('Y')];
+      $tk = $this->crud_model->read('transaksi_sequence',$where_sequence)->row();
+      if(!empty($tk->nomor)){
+        $last = $tk->nomor;
+      }else{
+        $last = 0;
+      }
+      
       if(empty($id)){
-        redirect('transaksi/keluar/TK-'.str_pad(date('ymd').$last, 9, '0', STR_PAD_LEFT), 'refresh');
+        if(empty($tk)){
+          $this->crud_model->create('transaksi_sequence', ['jenis' => 'TK', 'nomor' => '1', 'bulan' => date('m'), 'tahun' => date('Y')]);
+        }else{
+          $this->crud_model->update('transaksi_sequence', $where_sequence,['nomor' => $tk->nomor + 1]);
+        }
+        redirect('transaksi/keluar/TK-'.date('Y-m-').$last, 'refresh');
       }
       $where = [
         'DATE(tanggal)' => date('Y-m-d')
@@ -90,11 +100,13 @@ class Transaksi extends CI_Controller {
               'created_by' => $this->session->username,
               'created_at' => date('Y-m-d H:i:s')
             );
-            $this->crud_model->create('transaksi_masuk', $data);
+            $this->db->trans_start();
             
+            $this->crud_model->create('transaksi_masuk', $data);
             $stock_sekarang = $data_barang->quantity_on_hand + $data['qty'];
             $this->crud_model->update('inventory', array('kd_barang' => $data['kd_barang']), array('quantity_on_hand' => $stock_sekarang));
             
+            $this->db->trans_complete();
             $message = preg_replace("/(\n)+/m", ' ', strip_tags( $data['kd_barang']." Berhasil di simpan"));
             $notify = array('title' => 'Info :',
                           'message' => $message,
@@ -123,11 +135,14 @@ class Transaksi extends CI_Controller {
             $cek_stock = $this->crud_model->read('inventory', array('kd_barang' => $data['kd_barang']))->row();
   
             if($cek_stock->quantity_on_hand >= $data['qty']){
+              $this->db->trans_start();
               $this->crud_model->create('transaksi_keluar', $data);
               
               $stock_sekarang = $data_barang->quantity_on_hand - $data['qty'];
               $this->crud_model->update('inventory', array('kd_barang' => $data['kd_barang']), array('quantity_on_hand' => $stock_sekarang));
-                
+              
+              $this->db->trans_complete();
+
               $message = preg_replace("/(\n)+/m", ' ', strip_tags( $data['kd_barang']." Berhasil di simpan"));
               $notify = array('title' => 'Info :',
                             'message' => $message,
@@ -249,9 +264,12 @@ class Transaksi extends CI_Controller {
             $transaksi = $this->crud_model->read('transaksi_masuk', $where)->row();
             $data_barang = $this->crud_model->read('inventory', array('kd_barang' => $transaksi->kd_barang))->row();
             $stock_sekarang = $data_barang->quantity_on_hand - $transaksi->qty;
+
+            $this->db->trans_start();
             $this->crud_model->update('inventory', array('kd_barang' => $transaksi->kd_barang), array('quantity_on_hand' => $stock_sekarang));
 
             $this->crud_model->delete('transaksi_masuk', $where);
+            $this->db->trans_complete();
             $message = preg_replace("/(\n)+/m", ' ', strip_tags(" Berhasil di hapus"));
             $notify = array('title' => 'Info :',
                           'message' => $message,
@@ -271,10 +289,11 @@ class Transaksi extends CI_Controller {
           $transaksi = $this->crud_model->sum('transaksi_keluar','qty', $where)->row();
           $data_barang = $this->crud_model->read('inventory', array('kd_barang' => $where['kd_barang']))->row();
           $stock_sekarang = $data_barang->quantity_on_hand + $transaksi->qty;
-
+          $this->db->trans_start();
           $this->crud_model->update('inventory', array('kd_barang' => $where['kd_barang']), array('quantity_on_hand' => $stock_sekarang));
           $this->crud_model->delete('transaksi_keluar', $where);
-
+          $this->db->trans_complete();
+          
           $message = preg_replace("/(\n)+/m", ' ', strip_tags(" Berhasil di hapus"));
           $notify = array('title' => 'Info :',
                         'message' => $message,
@@ -949,5 +968,23 @@ class Transaksi extends CI_Controller {
       $printer->feed();
       $printer->pulse();
       $printer->close();
+    }
+
+    public function migrate($table)
+    {
+      echo 'Please wait, MySQL to SQLite database migration is in progress...';
+      $query = $this->crud_model->mysql_read($table)->result();
+      foreach ($query as $key => $rows) {
+        $this->db->trans_start();
+          $this->crud_model->create($table, $rows);
+          if($table == 'transaksi_masuk'){
+            $where = ['tm_id' => $rows->tm_id];
+          }else{
+            $where = ['tk_id' => $rows->tk_id];
+          }
+          $this->crud_model->mysql_delete($table, $where);
+        $this->db->trans_complete();
+      }
+      redirect($this->agent->referrer());
     }
 }

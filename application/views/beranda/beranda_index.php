@@ -84,13 +84,13 @@
   };
   var pdata = [
     {
-      value: 300,
+      value: 90,
       color: "#46BFBD",
       highlight: "#5AD3D1",
       label: "Complete"
     },
     {
-      value: 50,
+      value: 10,
       color:"#F7464A",
       highlight: "#FF5A5E",
       label: "In-Progress"

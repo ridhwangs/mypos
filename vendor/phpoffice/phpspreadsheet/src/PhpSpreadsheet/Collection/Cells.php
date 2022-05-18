@@ -4,8 +4,8 @@ namespace PhpOffice\PhpSpreadsheet\Collection;
 
 use Generator;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
+use PhpOffice\PhpSpreadsheet\Settings;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Psr\SimpleCache\CacheInterface;
 
@@ -76,7 +76,7 @@ class Cells
     /**
      * Return the parent worksheet for this cell collection.
      *
-     * @return Worksheet
+     * @return null|Worksheet
      */
     public function getParent()
     {
@@ -151,8 +151,6 @@ class Cells
     {
         $sortKeys = [];
         foreach ($this->getCoordinates() as $coord) {
-            $column = '';
-            $row = 0;
             sscanf($coord, '%[A-Z]%d', $column, $row);
             $sortKeys[sprintf('%09d%3s', $row, $column)] = $coord;
         }
@@ -172,8 +170,6 @@ class Cells
         $col = ['A' => '1A'];
         $row = [1];
         foreach ($this->getCoordinates() as $coord) {
-            $c = '';
-            $r = 0;
             sscanf($coord, '%[A-Z]%d', $c, $r);
             $row[$r] = $r;
             $col[$c] = strlen($c) . $c;
@@ -181,7 +177,7 @@ class Cells
 
         // Determine highest column and row
         $highestRow = max($row);
-        $highestColumn = substr(max($col), 1);
+        $highestColumn = substr((string) @max($col), 1);
 
         return [
             'row' => $highestRow,
@@ -192,7 +188,7 @@ class Cells
     /**
      * Return the cell coordinate of the currently active cell object.
      *
-     * @return string
+     * @return null|string
      */
     public function getCurrentCoordinate()
     {
@@ -206,10 +202,7 @@ class Cells
      */
     public function getCurrentColumn()
     {
-        $column = '';
-        $row = 0;
-
-        sscanf($this->currentCoordinate, '%[A-Z]%d', $column, $row);
+        sscanf($this->currentCoordinate ?? '', '%[A-Z]%d', $column, $row);
 
         return $column;
     }
@@ -221,10 +214,7 @@ class Cells
      */
     public function getCurrentRow()
     {
-        $column = '';
-        $row = 0;
-
-        sscanf($this->currentCoordinate, '%[A-Z]%d', $column, $row);
+        sscanf($this->currentCoordinate ?? '', '%[A-Z]%d', $column, $row);
 
         return (int) $row;
     }
@@ -232,7 +222,7 @@ class Cells
     /**
      * Get highest worksheet column.
      *
-     * @param string $row Return the highest column for the specified row,
+     * @param null|int|string $row Return the highest column for the specified row,
      *                    or the highest column of any row if no row number is passed
      *
      * @return string Highest column name
@@ -240,30 +230,25 @@ class Cells
     public function getHighestColumn($row = null)
     {
         if ($row === null) {
-            $colRow = $this->getHighestRowAndColumn();
-
-            return $colRow['column'];
+            return $this->getHighestRowAndColumn()['column'];
         }
 
-        $columnList = [1];
+        $maxColumn = '1A';
         foreach ($this->getCoordinates() as $coord) {
-            $c = '';
-            $r = 0;
-
             sscanf($coord, '%[A-Z]%d', $c, $r);
             if ($r != $row) {
                 continue;
             }
-            $columnList[] = Coordinate::columnIndexFromString($c);
+            $maxColumn = max($maxColumn, strlen($c) . $c);
         }
 
-        return Coordinate::stringFromColumnIndex(max($columnList));
+        return substr($maxColumn, 1);
     }
 
     /**
      * Get highest worksheet row.
      *
-     * @param string $column Return the highest row for the specified column,
+     * @param null|string $column Return the highest row for the specified column,
      *                       or the highest row of any column if no column letter is passed
      *
      * @return int Highest row number
@@ -271,24 +256,19 @@ class Cells
     public function getHighestRow($column = null)
     {
         if ($column === null) {
-            $colRow = $this->getHighestRowAndColumn();
-
-            return $colRow['row'];
+            return $this->getHighestRowAndColumn()['row'];
         }
 
-        $rowList = [0];
+        $maxRow = 1;
         foreach ($this->getCoordinates() as $coord) {
-            $c = '';
-            $r = 0;
-
             sscanf($coord, '%[A-Z]%d', $c, $r);
             if ($c != $column) {
                 continue;
             }
-            $rowList[] = $r;
+            $maxRow = max($maxRow, $r);
         }
 
-        return max($rowList);
+        return $maxRow;
     }
 
     /**
@@ -298,13 +278,13 @@ class Cells
      */
     private function getUniqueID()
     {
-        return uniqid('phpspreadsheet.', true) . '.';
+        return Settings::getCache() instanceof Memory
+            ? random_bytes(7) . ':'
+            : uniqid('phpspreadsheet.', true) . '.';
     }
 
     /**
      * Clone the cell collection.
-     *
-     * @param Worksheet $worksheet The new worksheet that we're copying to
      *
      * @return self
      */
@@ -314,7 +294,7 @@ class Cells
         $newCollection = clone $this;
 
         $newCollection->parent = $worksheet;
-        if (($newCollection->currentCell !== null) && (is_object($newCollection->currentCell))) {
+        if (is_object($newCollection->currentCell)) {
             $newCollection->currentCell->attach($this);
         }
 
@@ -327,16 +307,14 @@ class Cells
         // Change prefix
         $newCollection->cachePrefix = $newCollection->getUniqueID();
         foreach ($oldValues as $oldKey => $value) {
-            $newValues[str_replace($oldCachePrefix, $newCollection->cachePrefix, $oldKey)] = clone $value;
+            /** @var string $newKey */
+            $newKey = str_replace($oldCachePrefix, $newCollection->cachePrefix, $oldKey);
+            $newValues[$newKey] = clone $value;
         }
 
         // Store new values
         $stored = $newCollection->cache->setMultiple($newValues);
-        if (!$stored) {
-            $newCollection->__destruct();
-
-            throw new PhpSpreadsheetException('Failed to copy cells in cache');
-        }
+        $this->destructIfNeeded($stored, $newCollection, 'Failed to copy cells in cache');
 
         return $newCollection;
     }
@@ -349,9 +327,6 @@ class Cells
     public function removeRow($row): void
     {
         foreach ($this->getCoordinates() as $coord) {
-            $c = '';
-            $r = 0;
-
             sscanf($coord, '%[A-Z]%d', $c, $r);
             if ($r == $row) {
                 $this->delete($coord);
@@ -367,9 +342,6 @@ class Cells
     public function removeColumn($column): void
     {
         foreach ($this->getCoordinates() as $coord) {
-            $c = '';
-            $r = 0;
-
             sscanf($coord, '%[A-Z]%d', $c, $r);
             if ($c == $column) {
                 $this->delete($coord);
@@ -383,20 +355,25 @@ class Cells
      */
     private function storeCurrentCell(): void
     {
-        if ($this->currentCellIsDirty && !empty($this->currentCoordinate)) {
+        if ($this->currentCellIsDirty && isset($this->currentCoordinate, $this->currentCell)) {
             $this->currentCell->detach();
 
             $stored = $this->cache->set($this->cachePrefix . $this->currentCoordinate, $this->currentCell);
-            if (!$stored) {
-                $this->__destruct();
-
-                throw new PhpSpreadsheetException("Failed to store cell {$this->currentCoordinate} in cache");
-            }
+            $this->destructIfNeeded($stored, $this, "Failed to store cell {$this->currentCoordinate} in cache");
             $this->currentCellIsDirty = false;
         }
 
         $this->currentCoordinate = null;
         $this->currentCell = null;
+    }
+
+    private function destructIfNeeded(bool $stored, self $cells, string $message): void
+    {
+        if (!$stored) {
+            $cells->__destruct();
+
+            throw new PhpSpreadsheetException($message);
+        }
     }
 
     /**

@@ -90,9 +90,9 @@
             <li class="nav-item">
               <a class="nav-link" href="<?= site_url('pengaturan/perusahaan') ?>"><i class="app-menu__icon fas fa-cogs"></i> Setting Perusahaan</a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a class="nav-link" href="<?= site_url('pengaturan/backup') ?>"><i class="app-menu__icon fas fa-database"></i> Backup Database</a>
-            </li>
+            </li> -->
           </ul>
 
           <ul class="navbar-nav ml-auto">
@@ -126,7 +126,7 @@
               </ul>
             </li>
             <li><a class="app-menu__item" href="<?= site_url('pengaturan/perusahaan') ?>"><i class="app-menu__icon fas fa-cogs"></i><span class="app-menu__label">Setting Perusahaan</span></a></li>
-            <li><a class="app-menu__item" href="<?= site_url('pengaturan/backup') ?>"><i class="app-menu__icon fas fa-database"></i><span class="app-menu__label">Backup Database</span></a></li>
+            <!-- <li><a class="app-menu__item" href="<?= site_url('pengaturan/backup') ?>"><i class="app-menu__icon fas fa-database"></i><span class="app-menu__label">Backup Database</span></a></li> -->
             <li><hr style="border: 1px dashed white; "></li>
              <li><a class="app-menu__item" href="<?= site_url('auth/logout') ?>"><i class="app-menu__icon fas fa-sign-out-alt"></i><span class="app-menu__label">Logout</span></a></li>
           </ul>

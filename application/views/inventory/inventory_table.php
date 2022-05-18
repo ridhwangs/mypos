@@ -134,9 +134,9 @@
                 </div>
               </div>
             </div>
-            <div class="tile-footer mb-0">
+            <!-- <div class="tile-footer mb-0">
               <button class="btn btn-outline-primary btn-sm rounded-0"  onclick="ExportTo();">Download (.xlsx)</button>
-            </div>
+            </div> -->
       </div>
       <div class="tile-footer">
         

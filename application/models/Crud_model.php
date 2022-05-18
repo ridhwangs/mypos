@@ -6,6 +6,7 @@ class Crud_model extends CI_Model {
 
   public function __construct(){
       parent::__construct();
+      $this->mysql_db = $this->load->database('mysql_db', TRUE);
   }
 
     public function create($table, $data) {
@@ -41,5 +42,28 @@ class Crud_model extends CI_Model {
         ->where($where);
       $query = $this->db->get($table);
       return $query;
+    }
+
+    public function mysql_create($table, $data) {
+        $this->mysql_db->insert($table,  $data);
+    }
+    
+    public function mysql_read($table, $where = null, $order = null, $sort = null, $limit = null){
+      $this->mysql_db->from($table);
+      if($where != null){
+        $this->mysql_db->where($where);
+      }
+      if ($order != null) {
+        $this->mysql_db->order_by($order, $sort);
+      }
+      if ($limit != null) {
+        $this->mysql_db->limit($limit);
+      }
+      $query = $this->mysql_db->get();
+      return $query;
+    }
+
+    public function mysql_delete($table, $where) {
+      $this->mysql_db->where($where)->delete($table);
     }
 }

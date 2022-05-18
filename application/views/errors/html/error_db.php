@@ -1,64 +1,138 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-?><!DOCTYPE html>
+?>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Database Error</title>
-<style type="text/css">
+	<head>
+			<style>
+				body {
+					font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+					background: #3973aa;
+					color: #fefeff;
+					height: 100vh;
+					margin: 0;
+				}
 
-::selection { background-color: #E13300; color: white; }
-::-moz-selection { background-color: #E13300; color: white; }
+				#page {
+					display: table;
+					height: 100%;
+					margin: 0 auto;
+					margin-top: -10px;
+					width: 70%;
+					font-size: 1.9vw;
+				}
 
-body {
-	background-color: #fff;
-	margin: 40px;
-	font: 13px/20px normal Helvetica, Arial, sans-serif;
-	color: #4F5155;
-}
+				#container {
+					display: table-cell;
+					vertical-align: middle;
+				}
 
-a {
-	color: #003399;
-	background-color: transparent;
-	font-weight: normal;
-}
+				h1,
+				h2,
+				h3,
+				h4,
+				h5 {
+					font-weight: normal;
+					padding: 0;
+					margin: 25px 0;
+					margin-top: 0;
+					font-weight: 300;
+				}
 
-h1 {
-	color: #444;
-	background-color: transparent;
-	border-bottom: 1px solid #D0D0D0;
-	font-size: 19px;
-	font-weight: normal;
-	margin: 0 0 14px 0;
-	padding: 14px 15px 10px 15px;
-}
+				h1 {
+					font-size: 6.5em;
+					margin-bottom: 10px;
+				}
 
-code {
-	font-family: Consolas, Monaco, Courier New, Courier, monospace;
-	font-size: 12px;
-	background-color: #f9f9f9;
-	border: 1px solid #D0D0D0;
-	color: #002166;
-	display: block;
-	margin: 14px 0 14px 0;
-	padding: 12px 10px 12px 10px;
-}
+				h2 {
+					font-size: 1.5em;
+				}
 
-#container {
-	margin: 10px;
-	border: 1px solid #D0D0D0;
-	box-shadow: 0 0 8px #D0D0D0;
-}
+				h4 {
+					font-size: 1.4em;
+					line-height: 1.5em;
+				}
 
-p {
-	margin: 12px 15px 12px 15px;
-}
-</style>
-</head>
-<body>
-	<div id="container">
-		<h1><?php echo $heading; ?></h1>
-		<?php echo $message; ?>
-	</div>
-</body>
+				h5 {
+					line-height: 1.1em;
+					font-size: 1.3em;
+				}
+
+				#details {
+					display: flex;
+					flex-flow: row;
+					flex-wrap: nowrap;
+					padding-top: 10px;
+				}
+
+				#qr {
+					flex: 0 1 auto;
+				}
+
+				#image {
+					background: white;
+					padding: 5px;
+					line-height: 0;
+				}
+
+				#image img {
+					width: 9.8em;
+					height: 9.8em;
+				}
+
+				#stopcode {
+					padding-left: 10px;
+					flex: 1 1 auto;
+				}
+
+				@media (min-width: 840px) {
+					#page {
+						font-size: 140%;
+						width: 800px;
+					}
+				}
+			</style>
+	</head>
+	<body>
+		<div id="page">
+			<div id="container">
+				<h2>We're just collecting some error info, and then we'll restart for you.</h2>
+				<h2>
+				<span id="percentage">0</span>% complete</h2>
+				<div id="details">
+				<div id="qr">
+					<div id="image">
+					<img src="<?= base_url('assets/images/qr.png') ?>" alt="QR Code" />
+					</div>
+				</div>
+				<div id="stopcode">
+					<h4>For more information about this issue and possible fixes</h4>
+					<h5>If you call a support person, give them this info:
+					<br/>Stop Code: <?php echo $heading; ?> <?php echo $message; ?></h5>
+				</div>
+				</div>
+			</div>
+		</div>
+		<script>
+			var percentageElement = document.getElementById("percentage");
+			var percentage = 0;
+
+			function process() {
+			percentage += parseInt(Math.random() * 80);
+			if (percentage > 100) {
+				percentage = 100;
+				if(percentage = 100){
+					location.replace("<?= site_url(); ?>");
+					return;
+				}
+			}
+			percentageElement.innerText = percentage;
+				processInterval();
+			}
+
+			function processInterval() {
+				setTimeout(process, Math.random() * (1000 - 500) + 500)
+			}
+			processInterval();
+		</script>
+	</body>
 </html>

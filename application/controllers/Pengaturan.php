@@ -156,4 +156,10 @@ class Pengaturan extends CI_Controller {
       }
     }
 
+    public function exit_apps()
+    {
+        $command = "taskkill /F /IM PHP_DESKTOP_CHROME.exe /T";
+        exec($command);     
+    }
+
 }

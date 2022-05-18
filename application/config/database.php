@@ -72,32 +72,41 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 
 
-if (substr($_SERVER['REMOTE_ADDR'], 0, 4) == '127.' || $_SERVER['REMOTE_ADDR'] == '::1') {
-	// code for localhost here
-	$hostname = "127.0.0.1";
-}else{
-	$hostname = "127.0.0.1";
-}
-
-
 $active_group = 'default';
 $query_builder = TRUE;
 
-
-$username = "root";
-$password = "Lupalagi03";
-$db_debug = "(ENVIRONMENT !== 'production')";
-
 $db['default'] = array(
+	'dsn'      => 'sqlite:database/database.db',// path/to/database
+    'hostname' => '',
+    'username' => '',
+    'password' => '',
+    'database' => '',
+    'dbdriver' => 'pdo',
+    'dbprefix' => '',
+    'pconnect' => FALSE,
+    'db_debug' => (ENVIRONMENT == 'production'),
+    'cache_on' => FALSE,
+    'cachedir' => '',
+    'char_set' => 'utf8',
+    'dbcollat' => 'utf8_general_ci',
+    'swap_pre' => '',
+    'encrypt'  => FALSE,
+    'compress' => FALSE,
+    'stricton' => FALSE,
+    'failover' => array(),
+    'save_queries' => TRUE
+);
+
+$db['mysql_db'] = array(
 	'dsn'	=> '',
-	'hostname' => $hostname,
-	'username' => $username,
-	'password' => $password,
+	'hostname' => '127.0.0.1',
+	'username' => 'root',
+	'password' => 'Lupalagi03',
 	'database' => 'mypos',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
-	'db_debug' => $db_debug,
+	'db_debug' => (ENVIRONMENT == 'production'),
 	'cache_on' => FALSE,
 	'cachedir' => '',
 	'char_set' => 'utf8mb4',

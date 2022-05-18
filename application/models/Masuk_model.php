@@ -80,14 +80,13 @@ class Masuk_model extends CI_Model {
     public function rekap_pembelian()
     {
         $this->db->select('
-          MONTH(transaksi_masuk.tanggal)  AS bulan,
-          YEAR(transaksi_masuk.tanggal) AS tahun,
-          SUM(transaksi_masuk.harga * qty) AS harga,
-          COUNT(transaksi_masuk.kd_barang) AS jumlah_item,
-
+            strftime("%m", transaksi_masuk.tanggal)  AS bulan,
+            strftime("%Y", transaksi_masuk.tanggal) AS tahun,
+            SUM(transaksi_masuk.harga * qty) AS harga,
+            COUNT(transaksi_masuk.kd_barang) AS jumlah_item,
         ');
         $this->db->from($this->table);
-        $this->db->group_by('MONTH(transaksi_masuk.tanggal), YEAR(transaksi_masuk.tanggal)');
+        $this->db->group_by('strftime("%m", transaksi_masuk.tanggal),  strftime("%Y", transaksi_masuk.tanggal)');
         $this->db->order_by('transaksi_masuk.tanggal','DESC');
         $this->db->limit('6');
         $query = $this->db->get();

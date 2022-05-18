@@ -40,8 +40,10 @@
                     
                     <table class="table table-sm">
                         <tr>
-                            <td>Total Pendapatan Harian</td>
-                            <th><div class="text-right"><?= number_format($sum_pendapatan, 0, ',', '.') ?></div></th>
+                            <td>Total Pendapatan Harian  <small><a href="javascript:void(0);" data-toggle="collapse" data-target="#total_pendapatan_harian">Show/Hide</a></small></td>
+                            <th>
+                                <div class="collapse text-right" id="total_pendapatan_harian"><?= number_format($sum_pendapatan, 0, ',', '.') ?></div>
+                            </th>
                         </tr>
                     </table>
                 </div>
@@ -61,10 +63,10 @@
                                 <div class="form-group row mb-0">
                                     <div class="col-md-12">
                                         <div class="input-group">
-                                            <input class="form-control form-control-sm mr-2" type="text" id="kd_barang" name="kd_barang" autofocus required>
+                                            <input class="form-control form-control-sm mr-2" type="text" id="kd_barang" name="kd_barang" autofocus required placeholder="Barcode ID / Untuk Focus gunakan panah kiri (&#x2190;)">
                                             <!-- Button trigger modal -->
-                                            <button type="button" class="btn btn-primary btn-sm rounded-0" data-toggle="modal" data-target="#modalSearch">
-                                                <i class="fa fa-search" aria-hidden="true"></i>
+                                            <button type="button" id="btn-search" class="btn btn-primary btn-sm rounded-0" data-toggle="modal" data-target="#modalSearch">
+                                                <i class="fa fa-search" aria-hidden="true"></i> Cari (F1)
                                             </button>
                                         </div>
                                         <?php if(!empty($this->session->flashdata('message'))): ?>
@@ -111,7 +113,9 @@
                                     $sum_qty = 0;
                                     $sum_total = 0;
                                     $status = '';
+                                    $no = 0;
                                     foreach ($detail as $key => $rows) {
+                                        $no++;
                                         $inventory = $this->crud_model->read('inventory',['kd_barang' => $rows->kd_barang])->row();
                                         $sum_qty += $rows->qty;
                                         $sum_total += $rows->harga * $rows->qty;
@@ -120,8 +124,8 @@
                                              <input type="hidden" name="tk_id" value="<?= $rows->tk_id ?>">
                                         <?php
                                         echo '<tr>
-                                                <td width="1%">'.$inventory->kd_barang.'</td>
-                                                <td>'.$inventory->nm_barang.'</td>
+                                                <td class="text-uppercase" width="1%">'.$inventory->kd_barang.'</td>
+                                                <td class="text-uppercase">'.$inventory->nm_barang.'</td>
                                          
                                                 <td width="150px"><span class="float-left">Rp.</span><div class="text-right">'.number_format($rows->harga, 0, ',', '.').'</div></td>
                                                 <td width="1%">'.$inventory->satuan.'</td>
@@ -131,7 +135,7 @@
                                                     $status = true;
                                                 }else{
                                                     $status = false;
-                                                    echo '<input type="number" name="qty" id="qty_row" class="form-control form-control-sm rounded-0 text-center" value="'.$rows->qty.'" required>';
+                                                    echo '<input type="number" min="0" tabindex="'.$no.'" name="qty" id="qty_row" class="form-control form-control-sm rounded-0 text-center" value="'.$rows->qty.'" required>';
                                                 }
                                                 echo '</td>
                                                 <td><span class="float-left">Rp.</span> <div class="text-right">'.number_format($rows->harga * $rows->qty, 0, ',', '.').'</div></td>
@@ -158,14 +162,14 @@
                             </tr>
                             <tr>
                                 <th class="text-right" colspan="3">Bayar</th>
-                                <th><input class="form-control form-control-sm rupiah" type="text" name="bayar" placeholder="Pembayaran (Rp.)" id="bayar" required></th>
+                                <th><input class="form-control form-control-sm rupiah" type="text" name="bayar" placeholder="Pembayaran / Untuk Focus gunakan panah kanan (&#x2192;)" id="bayar" required></th>
                             </tr>
                         </form>
                         <?php
                             if($sum_total > 0) :
                         ?>
                         <tr class="bg-dark text-white">
-                            <th colspan="4"><i><?= ucwords(number_to_words($sum_total)); ?> Rupiah</i></th>
+                            <th colspan="4" class="p-2"><i><?= ucwords(number_to_words($sum_total)); ?> Rupiah</i></th>
                         </tr>
                         <?php endif; ?>
                     </table>
@@ -203,7 +207,7 @@
         </form>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-sm rounded-0" data-dismiss="modal">Close</button>
-        <button type="submit" form="form-modal-keluar" class="btn btn-primary btn-sm rounded-0">Tambah Barang</button>
+        <button type="submit" id="btn-tambah-barang" form="form-modal-keluar" class="btn btn-primary btn-sm rounded-0">Tambah Barang</button>
       </div>
     </div>
   </div>
@@ -211,6 +215,8 @@
 <script>
     <?php if(!empty($status)): ?>
         $("input").prop('disabled', true);
+        $("#btn-search").prop('disabled', true);
+        $("#btn-tambah-barang").prop('disabled', true);
     <?php endif; ?>
     var tanggal = '<?= date('Y-m-d'); ?>';
     <?php if(!empty($this->session->flashdata('autofocus'))): ?>
@@ -413,7 +419,7 @@
           window.location.href='<?= site_url('transaksi/export/keluar/'); ?>?tgl_awal=' + $("#tgl_awal").val() + '&tgl_akhir=' + $("#tgl_akhir").val() + '&cari=' + $("#cari").val();
         }
     }
-    $('body').on("keydown", function(e) {
+     $('body,input').on("keydown", function(e) {
             if(e.keyCode === 37){ // Check for the Ctrl key being pressed, and if the key = [S] (83)
                 $("#kd_barang").focus();
                 return false;
@@ -425,8 +431,25 @@
             if(e.keyCode == 70 && e.ctrlKey){
                 $('#modalSearch').modal('show'); 
             }
-            if(e.keyCode === 38){ 
+            if(e.keyCode === 112){ 
                 $('#modalSearch').modal('show'); 
+            }
+            if (e.keyCode == 36) {
+                $("input[tabindex=1]").focus().select();
+            }
+            if (e.keyCode == 35) {
+                $("input[tabindex=<?= $no; ?>]").focus().select();
+            }
+            if (e.keyCode == 33) {
+                var tab = $(this).prop("tabindex") - 1;
+                $("input[tabindex=" + tab + "]").focus().select();
+            }
+            if (e.keyCode == 34) {
+                var tab = $(this).prop("tabindex") + 1;
+                $("input[tabindex=" + tab + "]").focus().select();
+            }
+            if (e.keyCode == 27) {
+                $('#modalSearch').modal('hide'); 
             }
     });
 

@@ -391,7 +391,7 @@ class Inventory extends CI_Controller {
           $perushaan = $this->crud_model->read('perusahaan')->row();
 
           $data['title'] = 'Inventory Data Barang Export';
-          $fileName = 'Inventory Data Barang Export'.time();
+          $fileName = 'Inventory_Data_Barang_'.time();
           
           $spreadsheet = new Spreadsheet();
           $spreadsheet->getSheet(0);
@@ -569,7 +569,19 @@ class Inventory extends CI_Controller {
           //redirect(HTTP_UPLOAD_PATH.$fileName);
           $filepath = file_get_contents("assets/tmp_download/".$fileName);
           force_download($fileName, $filepath);
-          delete_files($filepath, true);
           die();
+    }
+
+    public function migrate()
+    {
+      echo 'Please wait, MySQL to SQLite database migration is in progress...';
+      $query = $this->crud_model->mysql_read('inventory')->result();
+      foreach ($query as $key => $rows) {
+        $this->db->trans_start();
+          $this->crud_model->create('inventory', $rows);
+          $this->crud_model->mysql_delete('inventory', ['kd_barang' => $rows->kd_barang]);
+        $this->db->trans_complete();
+      }
+      redirect($this->agent->referrer());
     }
 }

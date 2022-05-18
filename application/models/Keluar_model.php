@@ -88,8 +88,8 @@ class Keluar_model extends CI_Model {
     public function rekap_penjualan()
     {
         $this->db->select('
-          MONTH(transaksi_keluar.tanggal)  AS bulan,
-          YEAR(transaksi_keluar.tanggal) AS tahun,
+          strftime("%m", transaksi_keluar.tanggal)  AS bulan,
+          strftime("%Y", transaksi_keluar.tanggal) AS tahun,
           SUM(transaksi_keluar.harga * transaksi_keluar.qty) AS harga_jual,
           SUM(transaksi_masuk.harga * transaksi_keluar.qty) AS harga_beli,
           COUNT(transaksi_keluar.kd_barang) AS jumlah_item,
@@ -97,9 +97,9 @@ class Keluar_model extends CI_Model {
         ');
         $this->db->join('transaksi_masuk', 'transaksi_masuk.kd_barang = transaksi_keluar.kd_barang','left');
         $this->db->from($this->table);
-        $this->db->where('YEAR(transaksi_keluar.tanggal)',date('Y'));
-        $this->db->group_by('MONTH(transaksi_keluar.tanggal), YEAR(transaksi_keluar.tanggal)');
-        $this->db->order_by('MONTH(transaksi_keluar.tanggal)','ASC');
+        $this->db->where('strftime("%Y", transaksi_keluar.tanggal) = "'.date('Y').'"');
+        $this->db->group_by('strftime("%m", transaksi_keluar.tanggal), strftime("%Y", transaksi_keluar.tanggal)');
+        $this->db->order_by('strftime("%m", transaksi_keluar.tanggal) = "ASC"');
         $query = $this->db->get();
         return $query;
     }
